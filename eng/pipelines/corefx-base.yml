@@ -1,13 +1,15 @@
 parameters:
   name: ''
   pool: {}
-  strategy: {}
+  strategy: ''
   skipTests: true
   targetOS: ''
   testOuterloop: false
   container: ''
   buildScriptPrefix: ''
   submitToHelix: true
+  displayName: ''
+  customBuildSteps: ''
 
 jobs:
   - job: ${{ parameters.name }}
@@ -20,32 +22,39 @@ jobs:
         _buildScript: ./build.sh --ci
         _msbuildCommand: ./eng/common/msbuild.sh --warnaserror false --ci
 
+    displayName: ${{ parameters.displayName }}
     pool:
       ${{ insert }}: ${{ parameters.pool }}
-    strategy:
-      maxParallel: 99
-      ${{ insert }}: ${{ parameters.strategy }}
+    
+    ${{ if ne(parameters.strategy, '') }}:
+      strategy:
+        maxParallel: 99
+        ${{ insert }}: ${{ parameters.strategy }}
 
     container: ${{ parameters.container }}
-
-    steps:
-      - script: $(_buildScript)
-              -includetests
-              -framework $(framework)
-              /p:ArchGroup=$(_archGroup)
-              /p:ConfigurationGroup=$(_configuration)
-              /p:SkipTests=${{ parameters.skipTests }}
-              /p:ArchiveTests=${{ parameters.submitToHelix }}
-              /p:Outerloop=${{ parameters.testOuterloop }}
-              ${{ parameters.buildExtraArguments }}
-        displayName: Build Sources and Tests
-      
-      - ${{ if eq(parameters.submitToHelix, 'true') }}:
-        - template: /eng/pipelines/helix.yml
-          parameters:
-            targetOS: ${{ parameters.targetOS }}
-            archGroup: $(_archGroup)
-            configuration: $(_configuration)
-            helixQueues: $(helixQueues)
-            msbuildScript: $(_msbuildCommand)
-            framework: $(framework)
+    ${{ if eq(parameters.customBuildSteps, '') }}:
+      steps:
+        - script: $(_buildScript)
+                -includetests
+                -framework $(framework)
+                /p:ArchGroup=$(_archGroup)
+                /p:ConfigurationGroup=$(_configuration)
+                /p:SkipTests=${{ parameters.skipTests }}
+                /p:ArchiveTests=${{ parameters.submitToHelix }}
+                /p:Outerloop=${{ parameters.testOuterloop }}
+                ${{ parameters.buildExtraArguments }}
+          displayName: Build Sources and Tests
+        
+        - ${{ if eq(parameters.submitToHelix, 'true') }}:
+          - template: /eng/pipelines/helix.yml
+            parameters:
+              targetOS: ${{ parameters.targetOS }}
+              archGroup: $(_archGroup)
+              configuration: $(_configuration)
+              helixQueues: $(helixQueues)
+              msbuildScript: $(_msbuildCommand)
+              framework: $(framework)
+    
+    ${{ if ne(parameters.customBuildSteps, '') }}:
+      steps:
+        ${{ insert }}: ${{ parameters.customBuildSteps }}

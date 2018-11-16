@@ -18,11 +18,11 @@ variables:
   _uapNetfxQueue: Windows.10.Amd64.ClientRS4.Open
 
   # Linux queues
-  _linuxDefaultQueues: Centos.74.Amd64.Open+RedHat.74.Amd64.Open+Debian.87.Amd64.Open+Ubuntu.1404.Amd64.Open+Ubuntu.1604.Amd64.Open+Ubuntu.1804.Amd64.Open+OpenSuse.423.Amd64.Open+Fedora.27.Amd64.Open
+  _linuxDefaultQueues: Centos.7.Amd64.Open+RedHat.7.Amd64.Open+Debian.8.Amd64.Open+Ubuntu.1604.Amd64.Open+Ubuntu.1804.Amd64.Open+OpenSuse.42.Amd64.Open+Fedora.27.Amd64.Open
 
 jobs:
   # Include Windows legs
-  # - template: /eng/pipelines/windows.yml
+  - template: /eng/pipelines/windows.yml
   
     # Linux legs
   - template: /eng/pipelines/corefx-base.yml
@@ -31,27 +31,25 @@ jobs:
       strategy:
         matrix:
           # netcoreapp linux x64 release
-          # x64_Release:
-          #   _configuration: Release
-          #   _archGroup: x64
-          #   framework: netcoreapp
-          #   helixQueues: $(_linuxDefaultQueues)
-          #   submitToHelix: true
-          #   _dockerContainer: RhelContainer
-          #   _buildExtraArguments: ''
-
-          # linux-musl x64 debug
-          musl_x64_Debug:
-            _configuration: Debug
+          x64_Release:
+            _configuration: Release
             _archGroup: x64
             framework: netcoreapp
-            submitToHelix: false
-            _dockerContainer: AlpineContainer
-            _buildExtraArguments: /p:RuntimeOs=linux-musl /p:PortableBuild=false
+            helixQueues: $(_linuxDefaultQueues)
+            submitToHelix: true
+            _dockerContainer: RhelContainer
+            _buildExtraArguments: ''
+
+          # linux-musl x64 debug
+          # musl_x64_Debug:
+          #   _configuration: Debug
+          #   _archGroup: x64
+          #   framework: netcoreapp
+          #   submitToHelix: false
+          #   _dockerContainer: AlpineContainer
+          #   _buildExtraArguments: /p:RuntimeOs=linux-musl /p:PortableBuild=false
       pool:
-        name: default
-        demands:
-        - agent.name -equals santiagos-mbp  # check for specific string in capability
+        name: Hosted Ubuntu 1604
 
       targetOS: Linux
       container: $[ variables['_dockerContainer'] ]
