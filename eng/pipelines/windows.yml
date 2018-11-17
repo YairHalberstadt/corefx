@@ -70,7 +70,7 @@ jobs:
     customBuildSteps:
       - script: build.cmd
                 -ci
-                $(framework)
+                -$(framework)
                 /p:ArchGroup=$(_archGroup)
                 /p:ConfigurationGroup=$(_configuration)
                 /p:RuntimeOS=win10
@@ -86,7 +86,7 @@ jobs:
       - script: build.cmd
                 -ci
                 -test
-                $(framework)
+                -$(framework)
                 /p:ArchGroup=$(_archGroup)
                 /p:ConfigurationGroup=$(_configuration)
         displayName: Run Package Tests
