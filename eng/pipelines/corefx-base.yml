@@ -9,6 +9,7 @@ parameters:
   buildScriptPrefix: ''
   submitToHelix: true
   displayName: ''
+  useCustomBuildSteps: false
   customBuildSteps: []
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
         ${{ insert }}: ${{ parameters.strategy }}
 
     container: ${{ parameters.container }}
-    ${{ if eq(parameters.customBuildSteps, []) }}:
+    ${{ if eq(parameters.useCustomBuildSteps, 'false') }}:
       steps:
         - script: $(_buildScript)
                 -includetests
@@ -55,6 +56,6 @@ jobs:
               msbuildScript: $(_msbuildCommand)
               framework: $(framework)
     
-    ${{ if ne(parameters.customBuildSteps, []) }}:
+    ${{ if eq(parameters.useCustomBuildSteps, 'true') }}:
       steps:
         - ${{ parameters.customBuildSteps }}
