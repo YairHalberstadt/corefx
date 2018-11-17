@@ -57,4 +57,4 @@ jobs:
     
     ${{ if ne(parameters.customBuildSteps, '') }}:
       steps:
-        ${{ insert }}: ${{ parameters.customBuildSteps }}
+        - ${{ parameters.customBuildSteps }}
