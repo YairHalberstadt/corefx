@@ -9,7 +9,7 @@ parameters:
   buildScriptPrefix: ''
   submitToHelix: true
   displayName: ''
-  customBuildSteps: {}
+  customBuildSteps: []
 
 jobs:
   - job: ${{ parameters.name }}
